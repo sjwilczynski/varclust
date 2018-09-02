@@ -5,8 +5,9 @@
 #' span subspaces are not shared between clusters.
 #' 
 #' @param n An integer, number of individuals.
-#' @param SNR A numeric, signal to noise ratio measured as variance of the 
-#'   variable, element of a subspace, to the variance of noise.
+#' @param SNR A numeric or a vector of size K, signal to noise ratio measured as
+#'   variance of the variable, element of a subspace, to the variance of noise.
+#'   If a vector is passed it contains SNR for each cluster.
 #' @param K An integer, number of subspaces.
 #' @param numb.vars An integer, number of variables in each subspace.
 #' @param max.dim An integer, if equal.dims is TRUE then max.dim is dimension of
@@ -22,11 +23,17 @@
 #'   \item{s}{vector, true partiton of variables}
 #' @examples
 #' sim.data <- data.simulation()
-#' sim.data2 <- data.simulation(n = 30, SNR = 2, K = 5, numb.vars = 20, 
+#' sim.data2 <- data.simulation(n = 30, SNR = 2, K = 5, numb.vars = 20,
 #'                              max.dim = 3, equal.dims = FALSE)
 data.simulation <- function(n = 100, SNR = 1, K = 10, numb.vars = 30, max.dim = 2, 
-  min.dim = 1, equal.dims = TRUE) {
-  sigma <- 1/SNR
+                            min.dim = 1, equal.dims = TRUE) {
+  if (length(SNR) == 1) {
+    SNR <- rep(SNR, K)
+  }
+  if (length(SNR) != K) {
+    stop("Signal to noise ratio vector has different length than number of clusters")
+  }
+  sigma <- 1 / SNR
   # subspaces dimensions depend on equal.dims value
   if (equal.dims) {
     dims <- rep(max.dim, K)
@@ -40,8 +47,9 @@ data.simulation <- function(n = 100, SNR = 1, K = 10, numb.vars = 30, max.dim = 
   factors <- NULL
   for (j in 1:K) {
     Z <- qr.Q(qr(replicate(dims[j], rnorm(n, 0, 1))))
-    coeff <- matrix(runif(dims[j] * numb.vars, 0.1, 1) * sign(runif(dims[j] * 
-      numb.vars, -1, 1)), nrow = dims[j])
+    coeff <-
+      matrix(runif(dims[j] * numb.vars, 0.1, 1) * sign(runif(dims[j] *
+                                                               numb.vars,-1, 1)), nrow = dims[j])
     SIGNAL <- Z %*% coeff
     SIGNAL <- scale(SIGNAL)
     Y <- cbind(Y, SIGNAL)
@@ -49,7 +57,13 @@ data.simulation <- function(n = 100, SNR = 1, K = 10, numb.vars = 30, max.dim = 
     X <- cbind(X, SIGNAL + replicate(numb.vars, rnorm(n, 0, sigma)))
     s <- c(s, rep(j, numb.vars))
   }
-  return(list(X = X, signals = Y, factors = factors, dims = dims, s = s))
+  return(list(
+    X = X,
+    signals = Y,
+    factors = factors,
+    dims = dims,
+    s = s
+  ))
 }
 
 
@@ -75,8 +89,14 @@ data.simulation <- function(n = 100, SNR = 1, K = 10, numb.vars = 30, max.dim = 
 #' sim.data2 <- data.simulation.factors(n = 30, SNR = 2, K = 5, numb.vars = 20,
 #'              numb.factors = 10, max.dim = 3, equal.dims = FALSE, separation.parameter = 0.2)
 data.simulation.factors <- function(n = 100, SNR = 1, K = 10, numb.vars = 30, numb.factors = 10, 
-  min.dim = 1, max.dim = 2, equal.dims = TRUE, separation.parameter = 0.1) {
-  sigma <- 1/SNR
+                                    min.dim = 1, max.dim = 2, equal.dims = TRUE, separation.parameter = 0.1) {
+  if (length(SNR) == 1) {
+    SNR <- rep(SNR, K)
+  }
+  if (length(SNR) != K) {
+    stop("Signal to noise ratio vector has different length than number of clusters")
+  }
+  sigma <- 1 / SNR
   # subspaces dimensions depend on equal.dims value
   if (equal.dims) {
     dims <- rep(max.dim, K)
@@ -90,16 +110,25 @@ data.simulation.factors <- function(n = 100, SNR = 1, K = 10, numb.vars = 30, nu
   s <- NULL
   factors.indices <- list()
   for (j in 1:K) {
-    factors.indices[[j]] <- sample(numb.factors, dims[j], replace = FALSE)
+    factors.indices[[j]] <-
+      sample(numb.factors, dims[j], replace = FALSE)
     Z <- factors[, factors.indices[[j]], drop = FALSE]
-    coeff <- matrix(runif(dims[j] * numb.vars, separation.parameter, 1) * sign(runif(dims[j] * 
-      numb.vars, -1, 1)), nrow = dims[j])
+    coeff <-
+      matrix(runif(dims[j] * numb.vars, separation.parameter, 1) * sign(runif(dims[j] *
+                                                                                numb.vars,-1, 1)),
+             nrow = dims[j])
     SIGNAL <- Z %*% coeff
     SIGNAL <- scale(SIGNAL)
     Y <- cbind(Y, SIGNAL)
     X <- cbind(X, SIGNAL + replicate(numb.vars, rnorm(n, 0, sigma)))
     s <- c(s, rep(j, numb.vars))
   }
-  return(list(X = X, signals = Y, factors = factors, indices = factors.indices, 
-    dims = dims, s = s))
+  return(list(
+    X = X,
+    signals = Y,
+    factors = factors,
+    indices = factors.indices,
+    dims = dims,
+    s = s
+  ))
 }
