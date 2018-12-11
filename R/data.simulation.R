@@ -54,7 +54,7 @@ data.simulation <- function(n = 100, SNR = 1, K = 10, numb.vars = 30, max.dim = 
     SIGNAL <- scale(SIGNAL)
     Y <- cbind(Y, SIGNAL)
     factors <- cbind(factors, Z)
-    X <- cbind(X, SIGNAL + replicate(numb.vars, rnorm(n, 0, sigma)))
+    X <- cbind(X, SIGNAL + replicate(numb.vars, rnorm(n, 0, sigma[j])))
     s <- c(s, rep(j, numb.vars))
   }
   return(list(
@@ -120,7 +120,7 @@ data.simulation.factors <- function(n = 100, SNR = 1, K = 10, numb.vars = 30, nu
     SIGNAL <- Z %*% coeff
     SIGNAL <- scale(SIGNAL)
     Y <- cbind(Y, SIGNAL)
-    X <- cbind(X, SIGNAL + replicate(numb.vars, rnorm(n, 0, sigma)))
+    X <- cbind(X, SIGNAL + replicate(numb.vars, rnorm(n, 0, sigma[j])))
     s <- c(s, rep(j, numb.vars))
   }
   return(list(
