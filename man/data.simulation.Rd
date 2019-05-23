@@ -10,8 +10,9 @@ data.simulation(n = 100, SNR = 1, K = 10, numb.vars = 30,
 \arguments{
 \item{n}{An integer, number of individuals.}
 
-\item{SNR}{A numeric, signal to noise ratio measured as variance of the 
-variable, element of a subspace, to the variance of noise.}
+\item{SNR}{A numeric or a vector of size K, signal to noise ratio measured as
+variance of the variable, element of a subspace, to the variance of noise.
+If a vector is passed it contains SNR for each cluster.}
 
 \item{K}{An integer, number of subspaces.}
 
@@ -39,6 +40,6 @@ span subspaces are not shared between clusters.
 }
 \examples{
 sim.data <- data.simulation()
-sim.data2 <- data.simulation(n = 30, SNR = 2, K = 5, numb.vars = 20, 
+sim.data2 <- data.simulation(n = 30, SNR = 2, K = 5, numb.vars = 20,
                              max.dim = 3, equal.dims = FALSE)
 }

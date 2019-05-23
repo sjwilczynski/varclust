@@ -5,7 +5,7 @@
 \title{Calculates principal components for every cluster}
 \usage{
 calculate.pcas(X, segmentation, number.clusters, max.subspace.dim,
-  estimate.dimensions)
+  estimate.dimensions, prev.segmentation, prev.pcas)
 }
 \arguments{
 \item{X}{A data matrix.}
@@ -17,6 +17,10 @@ calculate.pcas(X, segmentation, number.clusters, max.subspace.dim,
 \item{max.subspace.dim}{An integer, upper bound for allowed dimension of subspace.}
 
 \item{estimate.dimensions}{A boolean, if TRUE subspaces dimensions are estimated using PESEL.}
+
+\item{prev.pcas}{A list, subset of principal components for every cluster from previous iteration.}
+
+\item{prev.segmenation}{A vector, segmentation of variables into clusters from previous iteration.}
 }
 \value{
 A subset of principal components for every cluster.

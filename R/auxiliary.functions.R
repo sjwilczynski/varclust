@@ -90,11 +90,16 @@ choose.cluster.BIC <- function(variable, pcas, number.clusters, show.warnings = 
 #' @param number.clusters An integer, number of subspaces (clusters).
 #' @param max.subspace.dim An integer, upper bound for allowed dimension of subspace.
 #' @param estimate.dimensions A boolean, if TRUE subspaces dimensions are estimated using PESEL.
+#' @param prev.segmenation A vector, segmentation of variables into clusters from previous iteration.
+#' @param prev.pcas A list, subset of principal components for every cluster from previous iteration.
 #' @keywords internal
 #' @return A subset of principal components for every cluster.
-calculate.pcas <- function(X, segmentation, number.clusters, max.subspace.dim, estimate.dimensions) {
+calculate.pcas <- function(X, segmentation, number.clusters, max.subspace.dim, estimate.dimensions, prev.segmentation, prev.pcas) {
   rowNumb <- dim(X)[1]
   pcas <- lapply(1:number.clusters, function(k) {
+    if(identical(prev.segmentation==k, segmentation==k)){
+      return(prev.pcas[[k]])
+    }
     Xk <- X[, segmentation == k, drop = F]
     sub.dim <- dim(Xk)
     if (sub.dim[2] > 0) {
